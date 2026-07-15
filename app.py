@@ -410,7 +410,7 @@ st.sidebar.caption(
 )
 
 # Reset: clears widget state so every filter returns to 'all values'.
-if st.sidebar.button("🔄 Reset Filters", use_container_width=True):
+if st.sidebar.button("🔄 Reset Filters", width="stretch"):
     for k in list(st.session_state.keys()):
         if k.startswith("flt_"):
             del st.session_state[k]
@@ -590,7 +590,7 @@ with tab_exec:
         fig = segment_bar(seg_rev, "Segment", "PurchaseAmount",
                           "Revenue by Behavioral Segment", "Revenue (USD)",
                           is_currency=True)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     with c2:
         daily = (fdf.groupby(fdf["TransactionDate"].dt.date)["PurchaseAmount"]
@@ -601,7 +601,7 @@ with tab_exec:
         fig.update_traces(hovertemplate="%{x}<br>Revenue: $%{y:,.2f}<extra></extra>")
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
         fig.update_layout(yaxis_title="Revenue (USD)", margin=dict(t=60, b=40))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.caption(
         "ℹ️ Transaction-based metrics count rows; customer-based metrics count "
@@ -621,24 +621,24 @@ with tab_seg:
     with c1:
         fig = segment_bar(seg_tbl, "Segment", "Revenue",
                           "Revenue by Segment", "Revenue (USD)", is_currency=True)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c2:
         fig = segment_bar(seg_tbl, "Segment", "UniqueCustomers",
                           "Unique Customers by Segment", "Unique Customers")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     c3, c4 = st.columns(2)
     with c3:
         fig = segment_bar(seg_tbl, "Segment", "AvgPurchase",
                           "Average Purchase Amount by Segment",
                           "Avg Purchase (USD)", is_currency=True)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c4:
         fig = segment_bar(seg_tbl, "Segment", "AvgSatisfaction",
                           "Average Satisfaction by Segment",
                           "Avg Satisfaction (1-5)")
         fig.update_yaxes(range=[0, 5])
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.markdown("#### Segment Performance Table")
     disp = seg_tbl.copy()
@@ -648,7 +648,7 @@ with tab_seg:
     disp["AvgSatisfaction"] = disp["AvgSatisfaction"].round(2)
     disp.columns = ["Segment", "Revenue", "Unique Customers", "Transactions",
                     "Avg Purchase", "Avg Satisfaction", "Revenue / Customer"]
-    st.dataframe(disp, use_container_width=True, hide_index=True)
+    st.dataframe(disp, width="stretch", hide_index=True)
 
     st.divider()
     st.subheader("Customer Value Analysis")
@@ -673,7 +673,7 @@ with tab_seg:
         fig.update_layout(xaxis_title="Total Revenue (USD)", yaxis_title="Customer",
                           margin=dict(t=60, b=40))
         fig.update_xaxes(tickprefix="$", tickformat=",.0f")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         st.markdown("#### Searchable Customer Table")
         search = st.text_input(
@@ -706,14 +706,14 @@ with tab_seg:
             "Primary Region", "Primary Channel", "Primary Category",
             "Risk Score", "Priority",
         ]
-        st.dataframe(show_fmt, use_container_width=True, hide_index=True)
+        st.dataframe(show_fmt, width="stretch", hide_index=True)
 
         st.download_button(
             "⬇️ Download customer-level table (CSV)",
             data=view.to_csv(index=False).encode("utf-8"),
             file_name="novaretail_customers_filtered.csv",
             mime="text/csv",
-            use_container_width=True,
+            width="stretch",
         )
 
 
@@ -734,7 +734,7 @@ with tab_market:
                           showlegend=False, margin=dict(t=60, b=40))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
         fig.update_traces(hovertemplate="%{x}<br>Revenue: $%{y:,.2f}<extra></extra>")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c2:
         ch_rev = (fdf.groupby("RetailChannel")["PurchaseAmount"].sum()
                   .reset_index())
@@ -747,7 +747,7 @@ with tab_market:
                           showlegend=False, margin=dict(t=60, b=40))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
         fig.update_traces(hovertemplate="%{x}<br>Revenue: $%{y:,.2f}<extra></extra>")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     c3, c4 = st.columns(2)
     with c3:
@@ -764,7 +764,7 @@ with tab_market:
                           margin=dict(t=60, b=40), barmode="stack")
         fig.update_traces(hovertemplate="%{x} — %{fullData.name}<br>"
                                         "Share: %{y:.1f}%<extra></extra>")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c4:
         ch_sat = (fdf.groupby("RetailChannel")["CustomerSatisfaction"].mean()
                   .reset_index())
@@ -776,7 +776,7 @@ with tab_market:
         fig.update_layout(xaxis_title="Channel", yaxis_title="Avg Satisfaction (1-5)",
                           showlegend=False, margin=dict(t=60, b=40))
         fig.update_yaxes(range=[0, 5])
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     st.markdown("#### Segment Revenue across Retail Channels")
     seg_ch = (fdf.groupby(["RetailChannel", "Segment"])["PurchaseAmount"]
@@ -788,7 +788,7 @@ with tab_market:
     fig.update_layout(xaxis_title="Channel", yaxis_title="Revenue (USD)",
                       margin=dict(t=60, b=40))
     fig.update_yaxes(tickprefix="$", tickformat=",.0f")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.divider()
     st.subheader("Product & Demographic Opportunities")
@@ -809,7 +809,7 @@ with tab_market:
                       coloraxis_showscale=False)
     if prefix == "$":
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     c5, c6 = st.columns(2)
     with c5:
@@ -820,7 +820,7 @@ with tab_market:
                      color="CustomerID", color_continuous_scale="Greens")
         fig.update_layout(xaxis_title="Product Category", yaxis_title="Unique Customers",
                           margin=dict(t=60, b=40), coloraxis_showscale=False)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c6:
         age_rev = (fdf.groupby("CustomerAgeGroup")["PurchaseAmount"].sum()
                    .reset_index().sort_values("CustomerAgeGroup"))
@@ -829,7 +829,7 @@ with tab_market:
         fig.update_layout(xaxis_title="Age Group", yaxis_title="Revenue (USD)",
                           showlegend=False, margin=dict(t=60, b=40))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     c7, c8 = st.columns(2)
     with c7:
@@ -840,7 +840,7 @@ with tab_market:
         fig.update_layout(xaxis_title="Gender", yaxis_title="Revenue (USD)",
                           showlegend=False, margin=dict(t=60, b=40))
         fig.update_yaxes(tickprefix="$", tickformat=",.0f")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     with c8:
         # Heatmap: revenue by region x standardized category.
         pivot = fdf.pivot_table(index="CustomerRegion",
@@ -857,7 +857,7 @@ with tab_market:
                 title="Revenue Heatmap: Region × Product Category (USD)",
             )
             fig.update_layout(margin=dict(t=60, b=40))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
 
 # ===========================================================================
@@ -920,7 +920,7 @@ The latest-date reference is the **full dataset's** newest transaction, so the
                                              "Low": "#2ca02c"})
             fig.update_layout(showlegend=False, margin=dict(t=60, b=40),
                               yaxis_title="Customers")
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         with c2:
             # Revenue vs satisfaction by segment (dual axis).
             present = [s for s in SEGMENT_ORDER if s in fdf["Segment"].unique()]
@@ -945,7 +945,7 @@ The latest-date reference is the **full dataset's** newest transaction, so the
                 yaxis2=dict(title="Avg Satisfaction (1-5)", overlaying="y",
                             side="right", range=[0, 5]),
                 legend=dict(orientation="h", y=1.12), margin=dict(t=80, b=40))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
         st.markdown("#### Risk & Priority Table")
         risk_view = cust_tbl.sort_values(
@@ -962,13 +962,13 @@ The latest-date reference is the **full dataset's** newest transaction, so the
         rv.columns = ["Customer ID", "Segment", "Priority", "Risk Score",
                       "Total Revenue", "Avg Satisfaction", "Unique Txns",
                       "Most Recent", "Region", "Channel"]
-        st.dataframe(rv, use_container_width=True, hide_index=True)
+        st.dataframe(rv, width="stretch", hide_index=True)
 
         st.download_button(
             "⬇️ Download prioritized customer list (CSV)",
             data=risk_view.to_csv(index=False).encode("utf-8"),
             file_name="novaretail_priority_customers.csv",
-            mime="text/csv", use_container_width=True,
+            mime="text/csv", width="stretch",
         )
 
         # -------------------------------------------------------------------
@@ -1076,12 +1076,12 @@ with tab_data:
     tx_disp = tx_view.copy()
     tx_disp["TransactionDate"] = pd.to_datetime(tx_disp["TransactionDate"]).dt.date
     tx_disp["PurchaseAmount"] = tx_disp["PurchaseAmount"].apply(fmt_currency)
-    st.dataframe(tx_disp, use_container_width=True, hide_index=True)
+    st.dataframe(tx_disp, width="stretch", hide_index=True)
     st.download_button(
         "⬇️ Download filtered transactions (CSV)",
         data=tx_view.to_csv(index=False).encode("utf-8"),
         file_name="novaretail_transactions_filtered.csv",
-        mime="text/csv", use_container_width=True,
+        mime="text/csv", width="stretch",
     )
 
     st.markdown("#### Customer-Level Summary Table")
@@ -1090,12 +1090,12 @@ with tab_data:
     else:
         cs = cust_tbl.copy()
         cs["MostRecentDate"] = pd.to_datetime(cs["MostRecentDate"]).dt.date
-        st.dataframe(cs, use_container_width=True, hide_index=True)
+        st.dataframe(cs, width="stretch", hide_index=True)
         st.download_button(
             "⬇️ Download customer summary (CSV)",
             data=cust_tbl.to_csv(index=False).encode("utf-8"),
             file_name="novaretail_customer_summary.csv",
-            mime="text/csv", use_container_width=True,
+            mime="text/csv", width="stretch",
         )
 
     st.divider()
@@ -1135,7 +1135,7 @@ satisfaction, below-median revenue, low frequency, and recency. Bands:
             sorted(PRODUCT_CATEGORY_MAP.items()),
             columns=["Original (raw)", "Standardized Group"],
         )
-        st.dataframe(map_df, use_container_width=True, hide_index=True, height=380)
+        st.dataframe(map_df, width="stretch", hide_index=True, height=380)
         st.caption(
             "Unforeseen labels fall back to keyword matching, then to the "
             "title-cased original — so nothing is dropped."

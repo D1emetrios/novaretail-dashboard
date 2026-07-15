@@ -64,5 +64,5 @@ transactions and unique customers, handled empty-filter and single-category
 edge cases, and framed all warning signals as descriptive rather than
 predictive given the small sample.
 
-**Public app URL:** _[paste your Streamlit Community Cloud URL here]_
-**GitHub repository:** _[paste your repository URL here]_
+**Public app URL:** https://novaretail-dashboard-djt.streamlit.app/
+**GitHub repository:** https://github.com/D1emetrios/novaretail-dashboard

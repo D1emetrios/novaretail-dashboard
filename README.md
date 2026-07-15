@@ -99,7 +99,7 @@ Make sure the repository is **public** so Streamlit Community Cloud can access i
 5. Copy the public URL Streamlit assigns and paste it below and into your
    Brightspace submission.
 
-**Public app URL:** `TODO — paste your Streamlit Community Cloud URL here`
+**Public app URL:** https://novaretail-dashboard-djt.streamlit.app/
 
 ## Customer-Priority Methodology
 
