@@ -1,169 +1,134 @@
-# Yelp Fusion API — Indianapolis Restaurants
+# NovaRetail Customer Intelligence Dashboard
 
-A small Python project that pulls restaurant data for Indianapolis from the
-**official Yelp Fusion API** and writes the results to CSV. Review excerpts
-are supported as an optional step — see the note on plan access below.
+An interactive Streamlit dashboard that helps NovaRetail leadership understand
+customer revenue, behavioral segments, regional/channel performance, product and
+demographic opportunities, and descriptive growth/retention warning signals.
 
-## What it collects
+## Business Objective
 
-For every restaurant the Fusion `/businesses/search` endpoint returns:
+NovaRetail is a nationwide omnichannel retailer. This dashboard helps leadership
+answer four questions:
 
-- `id`, `name`, `rating`, `review_count`, `url`
-- `address`, `city`, `state`, `zip_code`, `neighborhood`
-- `latitude`, `longitude`
-- `phone`, `price`, `categories` (semicolon-joined), `is_closed`
+1. Which customers and segments generate the most revenue?
+2. Which segments show warning signs of decline or reduced engagement?
+3. Which regions, product categories, demographic groups, and channels offer the
+   best growth and retention opportunities?
+4. Where should NovaRetail prioritize commercial and marketing investment?
 
-If `--reviews` is passed **and** the API key's plan grants access, the
-`/businesses/{id}/reviews` endpoint is hit for each business to pull up to
-3 review excerpts per restaurant (reviewer name, rating, text, timestamp).
+## Dashboard Features
 
-## Project layout
+- **Executive Overview** — KPI cards (total revenue, unique customers, unique
+  transactions, average purchase, average satisfaction, % revenue from Growth +
+  Promising, % customers in Decline), plus revenue-by-segment and daily revenue
+  trend. Each KPI is labeled transaction-based vs customer-based.
+- **Customer Segments** — revenue, unique customers, average purchase, and
+  average satisfaction by segment; a full segment performance table; a
+  customer-level value analysis with a Top-10 chart, a searchable table, and a
+  CSV download.
+- **Markets & Products** — revenue by region and channel, segment distribution by
+  region, average satisfaction by channel, segment revenue across channels,
+  revenue/customers by product category (with a switchable metric), revenue by
+  age and gender, and a region x category revenue heatmap.
+- **Growth & Retention** — a transparent, rules-based customer priority score,
+  high-priority KPIs, a priority table, a revenue-vs-satisfaction chart, a CSV
+  download, and **data-driven recommended actions**.
+- **Customer Data & Methodology** — filtered transaction table, customer-level
+  summary, data-quality notes, risk-score methodology, the product-category
+  standardization mapping, and CSV downloads.
+
+All KPIs and charts respond live to the sidebar filters (date range, segment,
+region, standardized product category, channel, age group, gender, and
+satisfaction). A **Reset Filters** button restores all defaults, and the app
+shows a clear message when filters return no records.
+
+## Repository File Structure
 
 ```
-yelp_api_project/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── .gitignore
-├── sample_reviews.csv          # placeholder rows for schema reference
-└── yelp_scraper/
-    ├── __init__.py
-    ├── client.py               # Yelp Fusion API wrapper + pagination
-    ├── exporter.py             # payload → flat CSV row shaping
-    └── main.py                 # CLI entry point
+novaretail-dashboard/
+├── app.py             # Streamlit application (all logic)
+├── requirements.txt   # Python dependencies
+├── README.md          # This file
+└── NR_dataset.xlsx    # Source data (worksheet: "data")
 ```
 
-Outputs are written to `./output/` by default:
+## Local Installation
 
-- `output/indianapolis_restaurants.csv`
-- `output/indianapolis_reviews.csv` (only if `--reviews` is used and access is granted)
-
-## Setup
-
-### 1. Get a Yelp API key
-
-1. Create an account and app at <https://docs.developer.yelp.com/>.
-2. Copy the private API key Yelp generates for your app.
-
-### 2. Install
+Requires Python 3.9+.
 
 ```bash
-# From the project root
+# 1. Clone your repository
+git clone https://github.com/<your-username>/novaretail-dashboard.git
+cd novaretail-dashboard
+
+# 2. (Optional) create a virtual environment
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
-### 3. Configure your key
+## Local Launch
 
 ```bash
-cp .env.example .env
-# then edit .env and paste your key into YELP_API_KEY=
+streamlit run app.py
 ```
 
-Or export it directly in your shell:
+The app opens at http://localhost:8501.
+
+## Upload to GitHub
 
 ```bash
-export YELP_API_KEY="your_key_here"   # Windows CMD: set YELP_API_KEY=your_key_here
+git init
+git add app.py requirements.txt README.md NR_dataset.xlsx
+git commit -m "NovaRetail customer intelligence dashboard"
+git branch -M main
+git remote add origin https://github.com/<your-username>/novaretail-dashboard.git
+git push -u origin main
 ```
 
-## Run
+Make sure the repository is **public** so Streamlit Community Cloud can access it.
 
-Businesses only (default):
+## Deploy to Streamlit Community Cloud
 
-```bash
-python -m yelp_scraper.main
-```
+1. Sign in at https://share.streamlit.io with your GitHub account.
+2. Click **Create app** → **Deploy a public app from GitHub**.
+3. Select your repository, the `main` branch, and set the main file to `app.py`.
+4. Click **Deploy**. The first build installs `requirements.txt` and launches the
+   app.
+5. Copy the public URL Streamlit assigns and paste it below and into your
+   Brightspace submission.
 
-Businesses **and** review excerpts:
+**Public app URL:** `TODO — paste your Streamlit Community Cloud URL here`
 
-```bash
-python -m yelp_scraper.main --reviews
-```
+## Customer-Priority Methodology
 
-Other useful flags:
+The priority score is a **transparent, rules-based heuristic — not a predictive
+machine-learning model.** Points accumulate per customer:
 
-```bash
-python -m yelp_scraper.main \
-    --location "Indianapolis, IN" \
-    --term restaurants \
-    --max-results 1000 \
-    --output-dir output \
-    --reviews \
-    --verbose
-```
-
-When it finishes you'll have:
-
-```
-output/indianapolis_restaurants.csv
-output/indianapolis_reviews.csv     # if --reviews succeeded
-```
-
-## Pagination & result limits
-
-The Fusion `/businesses/search` endpoint has two hard limits baked in by
-Yelp itself:
-
-- `limit` per request: **50** max
-- `offset + limit`: **1000** max
-
-This project paginates `limit=50` at a time up to that 1000-result ceiling,
-stopping earlier if Yelp's reported `total` is reached. For Indianapolis
-restaurants you will typically hit the 1000 cap.
-
-## Review access — plan-dependent
-
-**The `/businesses/{id}/reviews` endpoint is not available on every Yelp API
-plan.** If your plan doesn't include it, the API returns `403 Forbidden`
-when you call the reviews endpoint.
-
-This project handles that case cleanly:
-
-- When `--reviews` is passed, the first 403 from the reviews endpoint flips
-  review collection off for the rest of the run and logs a warning. The
-  business CSV still writes normally and the command exits 0.
-- `sample_reviews.csv` in the project root shows the exact schema the
-  `indianapolis_reviews.csv` file would use, with clearly-marked
-  `[PLACEHOLDER]` rows. Use it as a reference for grading/demo purposes
-  when your plan doesn't grant review access — **do not** submit it as
-  real scraped data.
-
-If you later upgrade to a plan with review access, re-run with
-`--reviews` and the real `output/indianapolis_reviews.csv` will populate.
-
-## Troubleshooting
-
-| Symptom | Likely cause |
+| Condition | Points |
 |---|---|
-| `ERROR: YELP_API_KEY not set` | `.env` missing or key not exported |
-| `403 Forbidden` on businesses | Key invalid, revoked, or out of quota |
-| `403 Forbidden` on reviews | Plan does not include review access — expected, run without `--reviews` |
-| Stops at ~1000 results | Yelp's hard cap on `offset + limit` |
-| `429` retries in logs | Rate-limited; the client backs off and retries automatically |
+| Segment = Decline | +3 |
+| Segment = Unclassified | +1 |
+| Average satisfaction < 3 | +2 |
+| Total revenue below the filtered median customer revenue | +2 |
+| Low frequency (<= 1 unique transaction) | +1 |
+| Most recent purchase >= 14 days before the dataset's latest date | +2 |
+| Most recent purchase 7-13 days before the latest date | +1 |
 
-## Zipping for submission
+Bands: **High >= 5, Medium 3-4, Low <= 2.** Recency is measured against the full
+dataset's latest transaction date so it stays stable across date filters.
 
-From the parent directory of `yelp_api_project`:
+## Data Notes & Disclaimer
 
-```bash
-# macOS/Linux — excludes venv, caches, and any .env you created
-zip -r yelp_api_project.zip yelp_api_project \
-    -x "yelp_api_project/.venv/*" \
-       "yelp_api_project/**/__pycache__/*" \
-       "yelp_api_project/.env" \
-       "yelp_api_project/output/*"
-```
+- The workbook holds ~100 transaction records. CustomerIDs and TransactionIDs
+  repeat, so row count, unique transactions, and unique customers are all
+  different and reported separately.
+- One record with a missing segment label is relabeled **Unclassified** (never
+  deleted). Inconsistent product categories (e.g. *Groceries/Grocery*,
+  *Books/Books & Magazines*) are standardized into broad groups while the
+  original category is preserved.
 
-On Windows (PowerShell):
-
-```powershell
-Compress-Archive -Path yelp_api_project -DestinationPath yelp_api_project.zip
-```
-
-Then double-check the archive doesn't contain your `.env`:
-
-```bash
-unzip -l yelp_api_project.zip | grep -i env
-# should show .env.example but NOT .env
-```
+**Disclaimer:** Findings are based on a small, representative sample covering a
+short period. All indicators are **descriptive, not causal or predictive**.
+Warning signals show where to investigate — they do not prove customer churn.
